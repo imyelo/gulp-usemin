@@ -416,6 +416,34 @@ describe('gulp-usemin', function() {
       });
     });
 
+    describe.only('mountsDir option:', function() {
+      function compare(mountsDir, done) {
+        var stream = usemin({mountsDir: mountsDir});
+        var expectedResourceName = 'app.js';
+        var expectedName = 'mounts-dir-js.html';
+        var dir;
+
+        stream.on('data', function(newFile) {
+          if (path.basename(newFile.path) === expectedResourceName) {
+            dir = path.dirname(newFile.path);
+          }
+          if (path.basename(newFile.path) === expectedName) {
+            assert.equal(dir, path.dirname(newFile.path));
+            assert.equal(String(getExpected(expectedName).contents), String(newFile.contents));
+            done();
+          }
+        });
+
+        stream.write(getFixture('mounts-dir-js.html'));
+      }
+
+      it('absolute path', function(done) {
+        compare({
+          'mount': ''
+        }, done);
+      });
+    });
+
     describe('conditional comments:', function() {
       function compare(name, expectedName, done) {
         var stream = usemin();
